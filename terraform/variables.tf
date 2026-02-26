@@ -7,32 +7,32 @@ variable "aws_region" {
 # Kinesis stream name for real-time stock data ingestion
 variable "kinesis_stream_name" {
   description = "Name of the Kinesis stream"
-  default     = "stock_data_stream_v2"
+  default     = "stock_data_stream_v1"
 }
 
 # DynamoDB table name for storing processed stock data
 variable "dynamodb_table_name" {
   description = "Name of the DynamoDB table"
-  default     = "stock-data-table-v2"
+  default     = "stock-data-table-v1"
 }
 
 # S3 bucket for storing raw unprocessed stock data
 # Used by Athena for historical analysis
 variable "s3_bucket_name" {
   description = "S3 bucket name for raw stock data"
-  default     = "stock-data-bucket6969-v2"
+  default     = "stock-data-bucket6969-v1"
 }
 
 # S3 bucket for storing Athena query results
 variable "athena_bucket_name" {
   description = "S3 bucket name for Athena query results"
-  default     = "athena-query-results6969-v2"
+  default     = "athena-query-results6969-v1"
 }
 
 # SNS topic name for sending stock trend alerts
 variable "sns_topic_name" {
   description = "SNS topic name for stock alerts"
-  default     = "stock-trend-alerts-v2"
+  default     = "stock-trend-alerts-v1"
 }
 
 # Email address to receive uptrend and downtrend SNS alerts
