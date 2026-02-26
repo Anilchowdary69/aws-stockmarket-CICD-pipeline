@@ -62,7 +62,7 @@ resource "aws_dynamodb_table" "stock_market_data" {
 # IAM Role for ProcessStockData Lambda
 # Allows Lambda to read from Kinesis, write to DynamoDB, S3, and send SNS alerts
 resource "aws_iam_role" "lambda_kinesis_role" {
-  name = "stock-data-manage-role"
+  name = "stock-data-manage-role-v2"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -104,7 +104,7 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
 # IAM Role for StockTrendAnalysis Lambda
 # Allows Lambda to read from DynamoDB and publish to SNS
 resource "aws_iam_role" "stock_trend_role" {
-  name = "stock-trend-role"
+  name = "stock-trend-role-v2"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -221,13 +221,13 @@ resource "aws_lambda_event_source_mapping" "dynamodb_trigger" {
 
 # Glue Database - acts as a catalog for Athena to query S3 data
 resource "aws_glue_catalog_database" "stock_database" {
-  name = "stock-data-db"
+  name = "stock-data-db-v2"
 }
 
 # Glue Table - defines the schema of raw stock data stored in S3
 # Athena uses this schema to query JSON files in S3
 resource "aws_glue_catalog_table" "stock_table" {
-  name          = "stock-glue-table"
+  name          = "stock-glue-table-v2"
   database_name = aws_glue_catalog_database.stock_database.name
 
   table_type = "EXTERNAL_TABLE"
