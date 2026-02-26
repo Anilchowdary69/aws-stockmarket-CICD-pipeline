@@ -1,0 +1,96 @@
+# This is my CI/CD pipeline for my stock market project
+# Every time i push code to main branch this runs automatically
+# It tests my code first and if tests pass it deploys to AWS using terraform
+
+name: Deploy Stock Market Pipeline
+
+# Run this pipeline when i push to main or when i click the button manually in github
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+# Variables i use throughout the pipeline so i dont hardcode them everywhere
+env:
+  AWS_REGION: us-east-1
+  TF_VERSION: 1.14.5
+
+jobs:
+  deploy:
+    name: Test and Deploy
+    runs-on: ubuntu-latest  # Github runs this on their own linux server
+
+    steps:
+      # -------------------------------------------------------
+      # CI PART - this is where i test my code before deploying
+      # -------------------------------------------------------
+
+      # First i need to get my code onto githubs server
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Install python 3.13 same version my lambda uses
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'
+
+      # Install pytest to run tests and boto3 because my lambda needs it
+      - name: Install dependencies
+        run: |
+          pip install pytest boto3
+
+      # Run all my tests - if any test fails the pipeline stops here
+      # nothing gets deployed to AWS until all tests pass
+      - name: Run tests
+        run: |
+          pytest tests/ -v
+
+      # -------------------------------------------------------
+      # CD PART - this is where i package and deploy to AWS
+      # -------------------------------------------------------
+
+      # Zip both my lambda files automatically
+      # i used to do this manually before - now the pipeline does it for me
+      - name: Zip Lambda functions
+        run: |
+          cd lambda
+          zip lambda_function.zip lambda_function.py
+          zip stock_trend_alert.zip stock_trend_alert.py
+          cp lambda_function.zip ../terraform/
+          cp stock_trend_alert.zip ../terraform/
+
+      # Connect github to my AWS account using my secret keys
+      # i stored the keys in github secrets so they are never visible in my code
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # Install terraform on githubs server same version i use on my laptop
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      # Initialize terraform and download the aws provider
+      - name: Terraform Init
+        run: |
+          cd terraform
+          terraform init
+
+      # Preview what terraform is going to change before applying
+      - name: Terraform Plan
+        run: |
+          cd terraform
+          terraform plan
+
+      # Deploy everything to AWS automatically
+      # auto-approve means it doesnt ask me to type yes because tests already passed
+      - name: Terraform Apply
+        run: |
+          cd terraform
+          terraform apply -auto-approve
