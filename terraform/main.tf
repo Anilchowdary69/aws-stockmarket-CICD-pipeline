@@ -157,7 +157,7 @@ resource "aws_sns_topic_subscription" "stock_alerts_email" {
 # Lambda_function - Processes Kinesis records
 # Reads stock data from Kinesis, stores processed data to DynamoDB and raw data to S3
 resource "aws_lambda_function" "process_stock_data" {
-  function_name = "ProcessStockData"
+  function_name = "ProcessStockData-v2"
   role          = aws_iam_role.lambda_kinesis_role.arn
   runtime       = "python3.13"
   handler       = "lambda_function.lambda_handler"
@@ -189,7 +189,7 @@ resource "aws_lambda_event_source_mapping" "kinesis_trigger" {
 # stock_trend_alert - Analyzes stock trends using SMA-5 and SMA-20
 # Triggers from DynamoDB Streams and sends SNS alerts on trend crossovers
 resource "aws_lambda_function" "stock_trend_analysis" {
-  function_name = "StockTrendAnalysis"
+  function_name = "StockTrendAnalysis-v2"
   role          = aws_iam_role.stock_trend_role.arn
   runtime       = "python3.13"
   handler       = "stock_trend_alert.lambda_handler"
