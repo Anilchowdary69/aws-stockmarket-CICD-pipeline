@@ -7,30 +7,28 @@ import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'lambda'))
 
 class TestLambdaFunction:
-    
-def test_lambda_import(self):
-    """Test that lambda_function can be imported without errors"""
-    import os
-    os.environ['AWS_DEFAULT_REGION'] = 'us-east-1'
-    os.environ['DYNAMO_TABLE'] = 'test-table'
-    os.environ['S3_BUCKET'] = 'test-bucket'
-    try:
-        import lambda_function
-        assert True
-    except ImportError as e:
-        pytest.fail(f"Failed to import lambda_function: {e}")
 
-def test_stock_trend_import(self):
-    """Test that stock_trend_alert can be imported without errors"""
-    import os
-    os.environ['AWS_DEFAULT_REGION'] = 'us-east-1'
-    os.environ['TABLE_NAME'] = 'test-table'
-    os.environ['SNS_TOPIC_ARN'] = 'arn:aws:sns:us-east-1:123456789:test'
-    try:
-        import stock_trend_alert
-        assert True
-    except ImportError as e:
-        pytest.fail(f"Failed to import stock_trend_alert: {e}")
+    def test_lambda_import(self):
+        """Test that lambda_function can be imported without errors"""
+        os.environ['AWS_DEFAULT_REGION'] = 'us-east-1'
+        os.environ['DYNAMO_TABLE'] = 'test-table'
+        os.environ['S3_BUCKET'] = 'test-bucket'
+        try:
+            import lambda_function
+            assert True
+        except ImportError as e:
+            pytest.fail(f"Failed to import lambda_function: {e}")
+
+    def test_stock_trend_import(self):
+        """Test that stock_trend_alert can be imported without errors"""
+        os.environ['AWS_DEFAULT_REGION'] = 'us-east-1'
+        os.environ['TABLE_NAME'] = 'test-table'
+        os.environ['SNS_TOPIC_ARN'] = 'arn:aws:sns:us-east-1:123456789:test'
+        try:
+            import stock_trend_alert
+            assert True
+        except ImportError as e:
+            pytest.fail(f"Failed to import stock_trend_alert: {e}")
 
     def test_kinesis_event_structure(self):
         """Test that a valid Kinesis event is structured correctly"""
@@ -54,7 +52,7 @@ def test_stock_trend_import(self):
         previous_close = 272.14
         price_change = round(price - previous_close, 2)
         price_change_percent = round((price_change / previous_close) * 100, 2)
-        
+
         assert price_change == 2.23
         assert price_change_percent == 0.82
 
@@ -62,7 +60,7 @@ def test_stock_trend_import(self):
         """Test anomaly detection — flags if price change exceeds 5 percent"""
         def detect_anomaly(change_percent):
             return "Yes" if abs(change_percent) > 5 else "No"
-        
+
         assert detect_anomaly(6.5) == "Yes"
         assert detect_anomaly(-6.5) == "Yes"
         assert detect_anomaly(2.3) == "No"
