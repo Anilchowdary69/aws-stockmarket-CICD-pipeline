@@ -66,4 +66,6 @@ def lambda_handler(event, context):
         except Exception as e:
             print(f"Error processing record: {e}")
 
+            print("CI/CD pipeline deployed this change automatically")
+
     return {"statusCode": 200, "body": "Processing Complete"}
