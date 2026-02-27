@@ -1,4 +1,9 @@
 terraform {
+  backend "s3" {
+    bucket = "stock-market-terraform-state-6969"
+    key    = "cicd-pipeline/terraform.tfstate"
+    region = "us-east-1"
+  }
   required_providers {
     aws = {
       source  = "hashicorp/aws"

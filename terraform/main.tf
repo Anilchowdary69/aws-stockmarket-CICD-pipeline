@@ -62,7 +62,7 @@ resource "aws_dynamodb_table" "stock_market_data" {
 # IAM Role for ProcessStockData Lambda
 # Allows Lambda to read from Kinesis, write to DynamoDB, S3, and send SNS alerts
 resource "aws_iam_role" "lambda_kinesis_role" {
-  name = "stock-data-manage-role-v1"
+  name = "stock-data-manage-role-cicd"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -104,7 +104,7 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
 # IAM Role for StockTrendAnalysis Lambda
 # Allows Lambda to read from DynamoDB and publish to SNS
 resource "aws_iam_role" "stock_trend_role" {
-  name = "stock-trend-role-v1"
+  name = "stock-trend-role-cicd"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -157,7 +157,7 @@ resource "aws_sns_topic_subscription" "stock_alerts_email" {
 # Lambda_function - Processes Kinesis records
 # Reads stock data from Kinesis, stores processed data to DynamoDB and raw data to S3
 resource "aws_lambda_function" "process_stock_data" {
-  function_name = "ProcessStockData-v1"
+  function_name = "ProcessStockData-cicd"
   role          = aws_iam_role.lambda_kinesis_role.arn
   runtime       = "python3.13"
   handler       = "lambda_function.lambda_handler"
@@ -189,7 +189,7 @@ resource "aws_lambda_event_source_mapping" "kinesis_trigger" {
 # stock_trend_alert - Analyzes stock trends using SMA-5 and SMA-20
 # Triggers from DynamoDB Streams and sends SNS alerts on trend crossovers
 resource "aws_lambda_function" "stock_trend_analysis" {
-  function_name = "StockTrendAnalysis-v1"
+  function_name = "StockTrendAnalysis-cicd"
   role          = aws_iam_role.stock_trend_role.arn
   runtime       = "python3.13"
   handler       = "stock_trend_alert.lambda_handler"
@@ -221,13 +221,13 @@ resource "aws_lambda_event_source_mapping" "dynamodb_trigger" {
 
 # Glue Database - acts as a catalog for Athena to query S3 data
 resource "aws_glue_catalog_database" "stock_database" {
-  name = "stock-data-db-v1"
+  name = "stock-data-db-cicd"
 }
 
 # Glue Table - defines the schema of raw stock data stored in S3
 # Athena uses this schema to query JSON files in S3
 resource "aws_glue_catalog_table" "stock_table" {
-  name          = "stock-glue-table-v1"
+  name          = "stock-glue-table-cicd"
   database_name = aws_glue_catalog_database.stock_database.name
 
   table_type = "EXTERNAL_TABLE"
