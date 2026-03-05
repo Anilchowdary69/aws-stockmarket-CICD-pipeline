@@ -6,9 +6,6 @@ name: Deploy Stock Market Pipeline
 
 # Run this pipeline when i push to main or when i click the button manually in github
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 # Variables i use throughout the pipeline so i dont hardcode them everywhere
